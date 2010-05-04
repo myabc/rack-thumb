@@ -78,6 +78,7 @@ module Rack
       @keylen = options[:keylength]
       @secret = options[:secret]
       @routes = generate_routes(options[:urls] || ["/"], options[:prefix])
+      @cache_duration = options[:cache_duration] || 3600*24*365 # (1 year)
     end
 
     # Generates routes given a list of prefixes.
@@ -154,6 +155,7 @@ module Rack
         throw :halt, [status, headers, body]
       end
 
+      headers["Cache-Control"] = "public, max-age=#{@cache_duration}"
       @source_headers = headers
 
       if !head?
